@@ -1,0 +1,179 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background: #ffe;
+	overflow-x: hidden;
+}
+
+a {
+	color: #3B5998;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+h1 {
+	background: url('/h1.png') 15px 17px no-repeat;
+	width: 540px;
+	height: 70px;
+}
+	h1 span {
+		display: none;
+	}
+
+#container {
+	background: #f60;
+	min-height: 240px;
+	height: auto !important;
+	height: 240px;
+}
+
+#topLayer {
+	position: absolute;
+	left: 540px;
+	top: 0;
+	display: block;
+	background: url('/bg.png') no-repeat;
+	width: 291px;
+	height: 380px;
+}
+
+/* ========================================================== */
+
+.intro {
+	padding: 15px;
+}
+	.intro p {
+		text-align: left;
+		color: #fff;
+		font-size: 14px;
+		line-height: 1.6;
+		margin: 15px 0;
+		width: 520px;
+	}
+
+h2.question {
+	background: url('/h2_question.png') no-repeat;
+	margin: 15px 0 0 15px;
+	width: 515px;
+	height: 160px;
+}
+	h2.question span {
+		display: none;
+	}
+
+.qa {
+	margin: 0 0 40px 15px;
+	width: 520px;
+}
+	.qa h3 {
+		text-align: left;
+		color: #fff;
+		font-size: 20px;
+		line-height: 1.4;
+		font-weight: normal;
+	}
+	.qa .answer {
+	}
+		.qa .answer span {
+			display: inline-block;
+			text-align: center;
+			color: #f60;
+			font-size: 16px;
+			line-height: 2.2;
+			background: #ffb380;
+			border-radius: 5px;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+			margin-right: 30px;
+			width: 160px;
+		}
+		.qa .answer span:hover {
+			background: #fff;
+			cursor: pointer;
+		}
+
+.submit {
+	width: 810px;
+}
+	.submit a {
+		display: block;
+		background: url('/submit.png');
+		margin: 20px auto;
+		width: 260px;
+		height: 45px;
+	}
+	.submit a:hover {
+		background-position: 0 -45px;
+	}
+		.submit a span {
+			display: none;
+		}
+
+.result {
+	padding: 30px;
+}
+	.result .result-wrapper {
+		background: #fff;
+		border-radius: 5px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		width: 515px;
+	}
+		.result .result-wrapper p.resultMes {
+			text-align: center;
+			color: #666;
+			font-size: 14px;
+			line-height: 1.6;
+			padding: 20px 0 15px 0;
+		}
+			.result .result-wrapper p.resultMes strong {
+				color: #000;
+				font-size: 24px;
+			}
+		.result .result-wrapper .restaurant {
+			margin: 0 auto;
+			padding-bottom: 30px;
+			width: 475px;
+		}
+			.result .result-wrapper .restaurant ul {
+				background: #f60;
+				height: 35px;
+			}
+				.result .result-wrapper .restaurant ul li {
+					float: left;
+					list-style: none;
+				}
+					.result .result-wrapper .restaurant ul li a {
+						display: block;
+						background: url('/restaurant_btns.png');
+						width: 158px;
+						height: 35px;
+					}
+					.result .result-wrapper .restaurant ul li.detail a {
+						background-position: 0 0;
+					}
+					.result .result-wrapper .restaurant ul li.detail a:hover {
+						background-position: 0 -35px;
+					}
+					.result .result-wrapper .restaurant ul li.map a {
+						background-position: -158px 0;
+					}
+					.result .result-wrapper .restaurant ul li.map a:hover {
+						background-position: -158px -35px;
+					}
+					.result .result-wrapper .restaurant ul li.message a {
+						background-position: -316px 0;
+					}
+					.result .result-wrapper .restaurant ul li.message a:hover {
+						background-position: -316px -35px;
+					}
+						.result .result-wrapper .restaurant ul li a span {
+							display: none;
+						}

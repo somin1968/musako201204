@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+{% if ua_check %}<meta name="viewport" content="width=575px;target-densitydpi=high-dpi" />{% endif %}
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<title>武蔵小山の飲食店との相性診断</title>
+<link href="/style.css" media="screen" rel="stylesheet" type="text/css" />
+{% if ua_check %}<link href="/sp.css" media="screen" rel="stylesheet" type="text/css" />{% endif %}
+<script type="text/javascript" src="/jquery.min.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#q1 span.yes').click(function() {
+			$('#q1 span.yes').css('background', '#fff');
+			$('#q1 span.no').css('background', '#ffb380');
+			$('#q1 input').attr('value', '0');
+			$('#q2').fadeIn();
+		});
+		$('#q1 span.no').click(function() {
+			$('#q1 span.yes').css('background', '#ffb380');
+			$('#q1 span.no').css('background', '#fff');
+			$('#q1 input').attr('value', '1');
+			$('#q2').fadeIn();
+		});
+		$('#q2 span.yes').click(function() {
+			$('#q2 span.yes').css('background', '#fff');
+			$('#q2 span.no').css('background', '#ffb380');
+			$('#q2 input').attr('value', '0');
+			$('#submit').fadeIn();
+		});
+		$('#q2 span.no').click(function() {
+			$('#q2 span.yes').css('background', '#ffb380');
+			$('#q2 span.no').css('background', '#fff');
+			$('#q2 input').attr('value', '1');
+			$('#submit').fadeIn();
+		});
+	});
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-12551696-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
+<h1><span>武蔵小山の飲食店との相性診断</span></h1>
+<div id="container">
+
+{% if current_user %}
+
+	<div class="intro">
+		<form name="f" method="post" action="/result">
+		<input type="hidden" name="check" value="1" />
+		<h2 class="question"><span>以下の質問に二択で答えてね</span></h2>
+		<div class="qa" id="q1">
+			<h3>食事の際はどちらを使うのが好き？</h3>
+			<p class="answer"><span class="yes">ナイフ&フォーク</span><span class="no">お箸</span></p>
+			<input type="hidden" name="q1" value="" />
+		</div>
+		<div class="qa" id="q2" style="display: none;">
+			<h3>外食はどちらのシチュエーションが多い？</h3>
+			<p class="answer"><span class="yes">家族や仲間と</span><span class="no">デートや接待</span></p>
+			<input type="hidden" name="q2" value="" />
+		</div>
+		<div class="submit" id="submit" style="display: none;"><a href="/result" onclick="document.f.submit(); return false;"><span>診断結果を見る</span></a></div>
+		</form>
+	</div>
+
+{% else %}
+
+	<div class="intro">
+		<p>武蔵小山に住んでいる、もしくは武蔵小山にゆかりのある、そして武蔵小山を愛しているメンバーで構成された「むさこアプリプロジェクト」が制作した、シンプルな診断アプリです。簡単な質問に答えるだけで、あなたにマッチする武蔵小山のレストランをご紹介します。</p>
+		<p><strong>診断を始めるには、このアプリへのログインが必要です。</strong></p>
+		<fb:login-button autologoutlink="true" scope="publish_stream">このアプリにログインする</fb:login-button>
+	</div>
+
+{% endif %}
+
+</div>
+<div id="topLayer">&nbsp;</div>
+
+<div id="fb-root"></div>
+<script>
+window.fbAsyncInit = function() {
+	FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true, oauth: true});
+	FB.Event.subscribe('auth.login', function(response) {
+		window.location.href = '/';
+	});
+	FB.Canvas.setAutoGrow();
+};
+(function() {
+	var e = document.createElement('script');
+	e.type = 'text/javascript';
+	e.src = document.location.protocol + '//connect.facebook.net/ja_JP/all.js';
+	e.async = true;
+	document.getElementById('fb-root').appendChild(e);
+}());
+</script>
+</body>
+</html>
