@@ -148,7 +148,7 @@ class ResultHandler( BaseHandler ) :
         	q2 = self.request.get( 'q2' )
         	result_id = q1 + q2 + str( int( user.id ) % 2 )
         	restaurant_id =  RESTAURANT_ID[result_id]
-        	graph_url = re.sub( '//www', '//graph', user.profile_url )
+        	graph_url = 'https://graph.facebook.com/' + user.id + '&locale=ja_JP'
         	file = urllib2.urlopen( graph_url )
         	content = file.read()
         	response = _parse_json( content )
@@ -217,10 +217,10 @@ class MessageHandler( BaseHandler ) :
 		)
 		self.response.out.write( template.render( path, args ) )
 
-class debugHandler( BaseHandler ) :
+class DebugHandler( BaseHandler ) :
     def get( self ) :
 		self.response.headers['Content-Type'] = 'text/plain'
-		self.response.out.write( 'debug' )
+		self.response.out.write( 'debug mode' )
 
 def main() :
     logging.getLogger().setLevel( logging.DEBUG )
@@ -230,7 +230,7 @@ def main() :
     	( r'/detail/(.*?)', DetailHandler ),
     	( r'/map/(.*?)', MapHandler ),
     	( r'/message/(.*?)', MessageHandler ),
-    	( r'/debug', debugHandler ),
+    	( r'/debug', DebugHandler ),
     ]
     util.run_wsgi_app( webapp.WSGIApplication( routes ) )
 
