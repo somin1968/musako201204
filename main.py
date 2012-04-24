@@ -45,6 +45,16 @@ import os.path
 import wsgiref.handlers
 import logging
 import urllib2
+import re
+
+try:
+    import simplejson as json
+except ImportError:
+    try:
+        from django.utils import simplejson as json
+    except ImportError:
+        import json
+_parse_json = json.loads
 
 from google.appengine.ext import db
 from google.appengine.ext import webapp
@@ -108,7 +118,7 @@ class BaseHandler( webapp.RequestHandler ) :
                     	id = str( profile['id'] ),
                     	name = profile['name'],
                     	profile_url = profile['link'],
-                    	access_token = cookie['access_token']
+                    	access_token = cookie['access_token'],
                     )
                     user.put()
                 elif user.access_token != cookie['access_token'] :
@@ -123,7 +133,7 @@ class HomeHandler( BaseHandler ) :
         args = dict(
         	current_user = self.current_user,
         	facebook_app_id = FACEBOOK_APP_ID,
-        	ua_check = gf_getBrowser( self.request.user_agent )
+        	ua_check = gf_getBrowser( self.request.user_agent ),
         )
         self.response.out.write( template.render( path, args ) )
 
@@ -138,7 +148,12 @@ class ResultHandler( BaseHandler ) :
         	q2 = self.request.get( 'q2' )
         	result_id = q1 + q2 + str( int( user.id ) % 2 )
         	restaurant_id =  RESTAURANT_ID[result_id]
-        	message = '%s %s さんは、武蔵小山の「%s」との相性が抜群との診断結果が出ました。近いうちに常連になりそうな予報が出ています。いや、もうすでに常連になっているかも!?　皆さんも試してみませんか？' % ( conf.get( restaurant_id, 'prepend' ).encode( 'utf-8' ), user.name.encode( 'utf-8' ), conf.get( restaurant_id, 'name' ).encode( 'utf-8' ) )
+        	graph_url = re.sub( '//www', '//graph', user.profile_url )
+        	file = urllib2.urlopen( graph_url )
+        	content = file.read()
+        	response = _parse_json( content )
+        	file.close()
+        	message = '%s %s さんは、武蔵小山の「%s」との相性が抜群との診断結果が出ました。近いうちに常連になりそうな予報が出ています。いや、もうすでに常連になっているかも!?　皆さんも試してみませんか？' % ( conf.get( restaurant_id, 'prepend' ).encode( 'utf-8' ), response['name'].encode( 'utf-8' ), conf.get( restaurant_id, 'name' ).encode( 'utf-8' ) )
         	name = '武蔵小山の飲食店との相性診断'
         	link = 'https://apps.facebook.com/musako_affinity_test/'
         	caption = 'レストラン相性診断アプリ'
@@ -149,7 +164,7 @@ class ResultHandler( BaseHandler ) :
             	'link': link,
             	'caption': caption,
             	'description': description,
-            	'picture': img_src
+            	'picture': img_src,
             }
         	graph = facebook.GraphAPI( user.access_token )
         	graph.put_wall_post( message, attachment )
@@ -158,7 +173,7 @@ class ResultHandler( BaseHandler ) :
 				current_user = user,
 				restaurant = {
 					'id': restaurant_id,
-					'name': conf.get( restaurant_id, 'name' )
+					'name': conf.get( restaurant_id, 'name' ),
 				},
         		facebook_app_id = FACEBOOK_APP_ID,
 				ua_check = gf_getBrowser( self.request.user_agent )
@@ -180,7 +195,7 @@ class DetailHandler( BaseHandler ) :
 			address = conf.get( restaurant_id, 'address' ),
 			phone = conf.get( restaurant_id, 'phone' ),
 			hours = conf.get( restaurant_id, 'hours' ),
-			closed = conf.get( restaurant_id, 'closed' )
+			closed = conf.get( restaurant_id, 'closed' ),
 		)
 		self.response.out.write( template.render( path, args ) )
 
@@ -190,7 +205,7 @@ class MapHandler( BaseHandler ) :
 		args = dict(
 			name = conf.get( restaurant_id, 'name' ),
 			latlng = conf.get( restaurant_id, 'latlng' ),
-			address = conf.get( restaurant_id, 'address' )
+			address = conf.get( restaurant_id, 'address' ),
 		)
 		self.response.out.write( template.render( path, args ) )
 
@@ -198,9 +213,14 @@ class MessageHandler( BaseHandler ) :
     def get( self, restaurant_id ) :
 		path = os.path.join( os.path.dirname( __file__ ), 'message.html' )
 		args = dict(
-			message = conf.get( restaurant_id, 'message' )
+			message = conf.get( restaurant_id, 'message' ),
 		)
 		self.response.out.write( template.render( path, args ) )
+
+class debugHandler( BaseHandler ) :
+    def get( self ) :
+		self.response.headers['Content-Type'] = 'text/plain'
+		self.response.out.write( 'debug' )
 
 def main() :
     logging.getLogger().setLevel( logging.DEBUG )
@@ -209,7 +229,8 @@ def main() :
     	( r'/result', ResultHandler ),
     	( r'/detail/(.*?)', DetailHandler ),
     	( r'/map/(.*?)', MapHandler ),
-    	( r'/message/(.*?)', MessageHandler )
+    	( r'/message/(.*?)', MessageHandler ),
+    	( r'/debug', debugHandler ),
     ]
     util.run_wsgi_app( webapp.WSGIApplication( routes ) )
 

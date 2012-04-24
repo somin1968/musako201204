@@ -47,7 +47,7 @@
 <div id="container">
 	<div class="result">
 		<div class="result-wrapper">
-			<p class="resultMes">あなたにぴったりなレストランは<br /><strong>{{ restaurant.name }}</strong> です。<br />診断結果をあなたのウォールに書き込みました（→<a href="https://www.facebook.com/profile.php?id={{ current_user.id }}" target="_parent">確認</a>）。</p>
+			<p class="resultMes">あなたにぴったりなレストランは<br /><strong>{{ restaurant.name }}</strong> です。<br />診断結果をあなたのウォールに書き込みました（→<a href="{{ current_user.profile_url }}" target="_parent">確認</a>）。</p>
 			<div class="restaurant">
 				<p><img src="/{{ restaurant.id }}.jpg" alt="{{ restaurant.name }}" /></p>
 				<ul>
