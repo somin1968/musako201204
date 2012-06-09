@@ -143,41 +143,50 @@ class HomeHandler( BaseHandler ) :
 class ResultHandler( BaseHandler ) :
     def get( self ) :
         if self.request.get( 'check' ) :
-        	user = self.current_user
-        	q1 = self.request.get( 'q1' )
-        	q2 = self.request.get( 'q2' )
-        	result_id = q1 + q2 + str( int( user.id ) % 2 )
-        	restaurant_id =  RESTAURANT_ID[result_id]
-        	graph_url = 'https://graph.facebook.com/' + user.id + '&locale=ja_JP'
-        	file = urllib2.urlopen( graph_url )
-        	content = file.read()
-        	response = _parse_json( content )
-        	file.close()
-        	message = '%s %s さんは、武蔵小山の「%s」との相性が抜群との診断結果が出ました。近いうちに常連になりそうな予報が出ています。いや、もうすでに常連になっているかも!?　皆さんも試してみませんか？' % ( conf.get( restaurant_id, 'prepend' ).encode( 'utf-8' ), response['name'].encode( 'utf-8' ), conf.get( restaurant_id, 'name' ).encode( 'utf-8' ) )
-        	name = '武蔵小山の飲食店との相性診断'
-        	link = 'https://apps.facebook.com/musako_affinity_test/'
-        	caption = 'レストラン相性診断アプリ'
-        	description = '診断結果は「%s」（%s／%s）でした。' % ( conf.get( restaurant_id, 'name' ).encode( 'utf-8' ), conf.get( restaurant_id, 'address' ).encode( 'utf-8' ), conf.get( restaurant_id, 'phone' ).encode( 'utf-8' ) )
-        	img_src = 'http://musako201204.appspot.com/%s.jpg' % ( restaurant_id )
-        	attachment = {
-            	'name': name,
-            	'link': link,
-            	'caption': caption,
-            	'description': description,
-            	'picture': img_src,
-            }
-        	graph = facebook.GraphAPI( user.access_token )
-        	graph.put_wall_post( message, attachment )
+        	if self.request.get( 'id' ) :
+        		id = self.request.get( 'id' )
+        		args = dict(
+        			restaurant = {
+						'id': id,
+						'name': conf.get( id, 'name' ),
+					}
+				)
+        	else :
+				user = self.current_user
+				q1 = self.request.get( 'q1' )
+				q2 = self.request.get( 'q2' )
+				result_id = q1 + q2 + str( int( user.id ) % 2 )
+				restaurant_id =  RESTAURANT_ID[result_id]
+				graph_url = 'https://graph.facebook.com/' + user.id + '&locale=ja_JP'
+				file = urllib2.urlopen( graph_url )
+				content = file.read()
+				response = _parse_json( content )
+				file.close()
+				message = '%s %s さんは、武蔵小山の「%s」との相性が抜群との診断結果が出ました。近いうちに常連になりそうな予報が出ています。いや、もうすでに常連になっているかも!?　皆さんも試してみませんか？' % ( conf.get( restaurant_id, 'prepend' ).encode( 'utf-8' ), response['name'].encode( 'utf-8' ), conf.get( restaurant_id, 'name' ).encode( 'utf-8' ) )
+				name = '武蔵小山の飲食店との相性診断'
+				link = 'https://apps.facebook.com/musako_affinity_test/'
+				caption = 'レストラン相性診断アプリ'
+				description = '診断結果は「%s」（%s／%s）でした。' % ( conf.get( restaurant_id, 'name' ).encode( 'utf-8' ), conf.get( restaurant_id, 'address' ).encode( 'utf-8' ), conf.get( restaurant_id, 'phone' ).encode( 'utf-8' ) )
+				img_src = 'http://musako201204.appspot.com/%s.jpg' % ( restaurant_id )
+				attachment = {
+					'name': name,
+					'link': link,
+					'caption': caption,
+					'description': description,
+					'picture': img_src,
+				}
+				graph = facebook.GraphAPI( user.access_token )
+				graph.put_wall_post( message, attachment )
+				args = dict(
+					current_user = user,
+					restaurant = {
+						'id': restaurant_id,
+						'name': conf.get( restaurant_id, 'name' ),
+					},
+					facebook_app_id = FACEBOOK_APP_ID,
+					ua_check = gf_getBrowser( self.request.user_agent )
+				)
         	path = os.path.join( os.path.dirname( __file__ ), 'result.html' )
-        	args = dict(
-				current_user = user,
-				restaurant = {
-					'id': restaurant_id,
-					'name': conf.get( restaurant_id, 'name' ),
-				},
-        		facebook_app_id = FACEBOOK_APP_ID,
-				ua_check = gf_getBrowser( self.request.user_agent )
-			)
         	self.response.out.write( template.render( path, args ) )
         else :
             self.redirect( '/' )
